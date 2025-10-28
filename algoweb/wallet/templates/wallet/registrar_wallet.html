@@ -1,0 +1,21 @@
+{% extends 'wallet/base.html' %}
+
+{% block title %}Registrar Wallet{% endblock %}
+
+{% block content %}
+<h2>Registrar nueva wallet</h2>
+
+{% if error %}
+  <p style="color:red;">{{ error }}</p>
+{% endif %}
+
+<p>Al registrar una nueva wallet se generará una dirección y una clave privada asociadas a tu cuenta.</p>
+
+<form method="POST">
+  {% csrf_token %}
+  <button type="submit" style="background:#00a3e0;color:#fff;border:none;padding:8px 12px;border-radius:4px;cursor:pointer">
+    Generar Wallet
+  </button>
+  <a href="{% url 'mi_wallet' %}" style="margin-left:12px">Volver a mi wallet</a>
+</form>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'wallet/base.html' %}
+
+{% block title %}Mi Wallet{% endblock %}
+
+{% block content %}
+<h2>Bienvenido, {{ user.username }}</h2>
+
+{% if address or wallet %}
+  <p><strong>Dirección:</strong>
+    <code>{{ adress|default:wallet.adress }}</code>
+  </p>
+
+  {% if balance is not none %}
+    <p><strong>Saldo:</strong> {{ balance }} Algos</p>
+  {% else %}
+    <p><strong>Saldo:</strong> (no disponible)</p>
+  {% endif %}
+
+<br>
+  <p style="margin-top:12px">
+    <a href="{% url 'registrar_wallet' %}" style="background:#f0f0f0;padding:8px 12px;border-radius:4px;text-decoration:none;color:#333">Regenerar wallet</a>
+    <a href="{% url 'transacciones' %}" style="margin-left:8px;background:#fff;border:1px solid #e1e6ea;padding:8px 12px;border-radius:4px;text-decoration:none;color:#333">Ver transacciones</a>
+  </p>
+
+  <script>
+    function copyPk(){
+      const el = document.getElementById('pk');
+      if(!el) return;
+      const text = el.innerText || el.textContent;
+      navigator.clipboard?.writeText(text).then(()=>{
+        alert('Clave privada copiada al portapapeles. Guárdala en un lugar seguro.');
+      }).catch(()=>{
+        prompt('Copia manualmente la clave privada:', text);
+      });
+    }
+  </script>
+
+{% else %}
+  <p>No tienes una wallet registrada.</p>
+  <a href="{% url 'registrar_wallet' %}" style="background:#00a3e0;color:#fff;padding:8px 12px;border-radius:4px;text-decoration:none;">Registrar wallet</a>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "wallet/base.html" %}
+
+{% block title %}Contactos registrados{% endblock %}
+
+{% block content %}
+  <h2>Contactos registrados</h2>
+
+  <section style="background:#fff;border:1px solid #e1e6ea;padding:12px;border-radius:6px;margin-bottom:16px">
+    <h3 style="margin:0 0 8px 0">Añadir contacto</h3>
+
+    {% if error %}
+      <p style="color:red">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" style="display:flex;gap:8px;flex-wrap:wrap">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create">
+      <div style="flex:1;min-width:180px">
+        <label>Nombre<br>
+          <input type="text" name="nombre" required maxlength="100" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px">
+        </label>
+      </div>
+      <br>
+      <div style="flex:1;min-width:220px">
+        <label>Email<br>
+          <input type="email" name="email" required style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px">
+        </label>
+      </div>
+      <br>
+      <div style="flex:1;min-width:220px">
+        <label>Dirección<br>
+          <input type="text" name="direccion" maxlength="58" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px">
+        </label>
+      </div>
+      <br>
+      <div style="align-self:end">
+        <button type="submit" style="background:#00a3e0;color:#fff;border:none;padding:8px 12px;border-radius:4px;cursor:pointer">Guardar contacto</button>
+      </div>
+    </form>
+  </section>
+
+  {% if contactos %}
+  <table style="border-collapse:collapse;width:100%">
+    <thead>
+      <tr>
+        <th style="border:1px solid #ccc;padding:8px;text-align:left">Nombre</th>
+        <th style="border:1px solid #ccc;padding:8px;text-align:left">Email</th>
+        <th style="border:1px solid #ccc;padding:8px;text-align:left">Dirección</th>
+        <th style="border:1px solid #ccc;padding:8px;text-align:left">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in contactos %}
+      <tr id="row-{{ c.pk }}">
+        <td style="border:1px solid #ccc;padding:8px;text-align:left">{{ c.nombre }}</td>
+        <td style="border:1px solid #ccc;padding:8px;text-align:left"><a href="mailto:{{ c.email }}">{{ c.email }}</a></td>
+        <td style="border:1px solid #ccc;padding:8px;text-align:left">{{ c.direccion }}</td>
+        <td style="border:1px solid #ccc;padding:8px;text-align:left;white-space:nowrap">
+          <button type="button" onclick="toggleEdit({{ c.pk }})" style="background:#f0f0f0;padding:6px 8px;border-radius:4px;margin-right:6px;border:none;cursor:pointer">Editar</button>
+
+          <form method="post" style="display:inline" onsubmit="return confirm('¿Eliminar contacto {{ c.nombre }} ?');">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="pk" value="{{ c.pk }}">
+            <button type="submit" style="background:#e04d4d;color:#fff;border:none;padding:6px 8px;border-radius:4px;cursor:pointer">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+
+      <tr id="edit-{{ c.pk }}" style="display:none;background:#fbfbfb">
+        <td colspan="4" style="padding:12px;border:1px solid #eee">
+          <form method="post" style="display:flex;gap:8px;flex-wrap:wrap;align-items:end">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="pk" value="{{ c.pk }}">
+
+            <div style="flex:1;min-width:180px">
+              <label>Nombre<br>
+                <input type="text" name="nombre" value="{{ c.nombre }}" required maxlength="100" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px">
+              </label>
+            </div>
+            <br>
+            <div style="flex:1;min-width:220px">
+              <label>Email<br>
+                <input type="email" name="email" value="{{ c.email }}" required style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px">
+              </label>
+            </div>
+            <br>
+            <div style="flex:1;min-width:220px">
+              <label>Dirección<br>
+                <input type="text" name="direccion" value="{{ c.direccion }}" maxlength="58" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px">
+              </label>
+            </div>
+            <br>
+            <div>
+              <button type="submit" style="background:#00a3e0;color:#fff;border:none;padding:8px 12px;border-radius:4px;cursor:pointer">Guardar</button>
+              <button type="button" onclick="toggleEdit({{ c.pk }})" style="margin-left:8px;background:#ddd;border:none;padding:8px 12px;border-radius:4px;cursor:pointer">Cancelar</button>
+            </div>
+          </form>
+        </td>
+      </tr>
+
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No hay contactos registrados.</p>
+  {% endif %}
+
+  <script>
+    function toggleEdit(pk) {
+      const tr = document.getElementById('edit-' + pk);
+      if (!tr) return;
+      tr.style.display = tr.style.display === 'none' ? '' : 'none';
+      // optional: scroll into view
+      if (tr.style.display !== 'none') tr.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  </script>
+{% endblock %}
